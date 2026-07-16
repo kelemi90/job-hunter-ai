@@ -1,0 +1,23 @@
+{
+  "name": "job-hunter-ai",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI-powered job hunting assistant for Finnish job markets.",
+  "packageManager": "pnpm@11.10.0",
+
+  "scripts": {
+    "dev": "pnpm --filter api start:dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format",
+    "test": "pnpm -r test",
+    "clean": "pnpm -r clean",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "keywords": [],
+  "author": "Kimmo Laine",
+  "license": "ISC",
+  "type": "module"
+}
