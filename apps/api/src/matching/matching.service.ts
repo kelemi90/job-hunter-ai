@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JobPosting, JobPreference } from '@prisma/client';
 import { NotificationsService } from '../notifications/notifications.service';
 import { AiMatchingService } from './ai-matching.service';
+import { OllamaMatchingService } from './ollama-matching.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MatchingService {
@@ -12,6 +14,8 @@ export class MatchingService {
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
     private readonly aiMatchingService: AiMatchingService,
+    private readonly ollamaMatchingService: OllamaMatchingService,
+    private readonly configService: ConfigService,
   ) {}
 
   async matchAllPendingJobs(userId: string) {
@@ -87,12 +91,24 @@ export class MatchingService {
 
     // 5. AI Analysis (Deeper check)
     let aiExplanation = '';
-    const aiResult = await this.aiMatchingService.analyzeMatch(
-      job.title,
-      job.description || '',
-      preferences.skills,
-      preferences,
-    );
+    const aiProvider = this.configService.get<string>('AI_PROVIDER') || 'openai';
+    let aiResult = null;
+
+    if (aiProvider === 'ollama') {
+      aiResult = await this.ollamaMatchingService.analyzeMatch(
+        job.title,
+        job.description || '',
+        preferences.skills,
+        preferences,
+      );
+    } else {
+      aiResult = await this.aiMatchingService.analyzeMatch(
+        job.title,
+        job.description || '',
+        preferences.skills,
+        preferences,
+      );
+    }
 
     if (aiResult) {
       // Average the deterministic score with AI score for a more balanced result

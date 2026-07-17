@@ -86,3 +86,26 @@ For even higher security, consider using Docker Secrets if you move to a Docker 
 *   **Log Auditing:** Regularly review your application and database logs for any suspicious activity.
 *   **Alerting:** Set up alerts for failed login attempts to your VM or database.
 *   **OpenAI Usage Monitoring:** Monitor your OpenAI usage dashboard for any unexpected spikes, which could indicate a compromised API key.
+
+## 5. Free AI Alternatives for Enhanced Privacy and Cost-Effectiveness
+
+While OpenAI offers powerful models, several free-tier APIs and local models can be used for your AI Matching Service, offering different trade-offs in terms of cost, privacy, and performance.
+
+### 5.1 Recommended Free AI Options
+
+| Provider | Model(s) Recommended | Pros | Cons | Use Case | Setup Notes |
+| :------- | :------------------- | :--- | :--- | :------- | :---------- |
+| **Groq Cloud** | Llama 3.1 (8B, 70B), Mixtral 8x7B | Extremely fast inference, access to powerful open-source models, generous free tier. | Rate limits can be tight for largest models. | Best balance of speed, intelligence, and free limits. | Requires a Groq API key. Update `AiMatchingService` to use Groq API endpoint. |
+| **Google Gemini API** | Gemini 1.5 Flash | Very high rate limits for free tier, massive context window (1M+ tokens). | Free tier data *may* be used for model improvement. | Best for processing very long job descriptions or multiple CVs. | Requires a Google Cloud Project and Gemini API key. Update `AiMatchingService` to use Gemini API endpoint. |
+| **Ollama (Local LLMs)** | Llama 3.1 8B, Mistral, Phi-3 | 100% private (data never leaves your machine), no rate limits, free forever. | Requires local hardware (GPU/RAM), slower than cloud APIs. | Absolute highest privacy priority. | Install Ollama on your Proxmox VM, download models, and update `AiMatchingService` to call the local Ollama endpoint. |
+
+### 5.2 Integrating Free AI Alternatives
+
+To switch from OpenAI to one of these alternatives, you would typically need to:
+
+1.  **Obtain an API Key:** For Groq or Gemini, sign up on their respective platforms and get an API key.
+2.  **Update Environment Variables:** Add the new API key (e.g., `GROQ_API_KEY` or `GEMINI_API_KEY`) to your `.env` file.
+3.  **Modify `AiMatchingService`:** Adjust the `AiMatchingService` to use the new API client and endpoint. For example, if using Groq, you would replace the OpenAI client with the Groq client and specify the desired model.
+4.  **Adjust Prompting:** Some models may require slight adjustments to the prompt for optimal performance.
+
+By leveraging these free alternatives, you can maintain the powerful AI capabilities of your Job Hunter while managing costs and enhancing privacy according to your preferences.

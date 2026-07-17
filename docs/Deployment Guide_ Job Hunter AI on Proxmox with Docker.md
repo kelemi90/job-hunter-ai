@@ -225,3 +225,57 @@ curl -X PUT http://localhost:3000/api/users/<YOUR_USER_ID>/preferences \
 ### 11.3 Why Use Plain Text?
 
 Using plain text ensures the highest compatibility with the AI model and avoids the complexity and potential errors of parsing binary file formats (PDF/Word) within the application. This approach gives you full control over exactly what information the AI sees.
+
+## 12. Integrating Ollama for Local AI Matching
+
+To use Ollama for your AI matching, you need to install Ollama on your Proxmox VM and download a model. This provides maximum privacy as your data never leaves your local machine.
+
+### 12.1 Install Ollama on Your Proxmox VM
+
+SSH into your Linux VM (the same one running Docker) and run the following command to install Ollama:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+This script will install Ollama as a systemd service, so it will start automatically on boot.
+
+### 12.2 Download an Ollama Model
+
+Once Ollama is installed, download a model. We recommend `llama3.1` for its balance of performance and size. You can run this command directly on your VM:
+
+```bash
+ollama run llama3.1
+```
+
+The first time you run this, Ollama will download the `llama3.1` model. This might take some time depending on your internet connection. You can exit the chat interface after the download is complete by typing `/bye`.
+
+### 12.3 Configure Your Project to Use Ollama
+
+Update your `.env` file in the `job-hunter-ai` root directory with the following settings:
+
+```env
+# --- AI PROVIDER ---
+AI_PROVIDER=ollama
+
+# --- OLLAMA CONFIG ---
+# If Ollama is running directly on your Proxmox VM host:
+OLLAMA_HOST=http://host.docker.internal:11434
+# Or if Ollama is running in another Docker container (adjust IP/port if needed):
+# OLLAMA_HOST=http://<OLLAMA_CONTAINER_IP>:11434
+OLLAMA_MODEL=llama3.1
+```
+
+*   `AI_PROVIDER=ollama`: This tells your NestJS application to use the `OllamaMatchingService`.
+*   `OLLAMA_HOST=http://host.docker.internal:11434`: This special hostname allows your Docker containers to communicate with services running directly on the Docker host machine (your Proxmox VM). If you decide to run Ollama itself in a Docker container, you would use that container's IP or service name.
+*   `OLLAMA_MODEL=llama3.1`: Specifies the model Ollama should use for analysis. Ensure this model is downloaded via `ollama run llama3.1`.
+
+### 12.4 Rebuild and Restart Your Docker Compose Services
+
+After updating your `.env` file, you need to rebuild and restart your Docker Compose services to apply the changes:
+
+```bash
+docker compose up --build -d
+```
+
+Your Job Hunter AI will now send its AI matching requests to your local Ollama instance, keeping your data entirely on your machine!
