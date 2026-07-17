@@ -7,11 +7,13 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # Copy root workspace files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-workspace.yaml ./
+# Copy lockfile if it exists, otherwise continue
+COPY pnpm-lock.yaml* ./
 COPY apps/api/package.json ./apps/api/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copy the rest of the application code
 COPY apps/api ./apps/api
@@ -44,4 +46,4 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Start the application
-CMD ["node", "apps/api/dist/main"]
+CMD ["node", "apps/api/dist/src/main.js"]
